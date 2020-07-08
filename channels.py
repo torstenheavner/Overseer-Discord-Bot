@@ -7,29 +7,14 @@ import requests
 
 
 
-class General(commands.Cog):
+class Channels(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
 
 
 	def cog_unload(self):
-		eou.log(text="Offline", cog="General", color="magenta")
-
-
-
-    # @commands.Cog.listener()
-    # async def on_message(self, message):
-    #     if message.author.bot:
-    #         return
-	#
-    #     for image in os.listdir("./images"):
-    #         if message.content == image.split(".")[0]:
-    #             try:
-    #                 await message.delete()
-    #             except:
-    #                 pass
-    #             await message.channel.send(message.author.name, file=discord.File("images/%s" % image))
+		eou.log(text="Offline", cog="Channels", color="magenta")
 
 
 
@@ -70,7 +55,7 @@ class General(commands.Cog):
 
 		# Send ouput and log to console
 		await ctx.send(embed=eou.makeEmbed(title="Success!", description="Channel%s successfully created." % ("s" if createVoice else "")))
-		eou.log(text="New DM created", cog="General", color="magenta", ctx=ctx)
+		eou.log(text="New DM created", cog="Channels", color="magenta", ctx=ctx)
 
 
 
@@ -97,7 +82,7 @@ class General(commands.Cog):
 
 		# Send output and log to console
 		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{ctx.author.name} has left {channelName}."))
-		eou.log(text=f"Left {channelName}", cog="General", color="magenta", ctx=ctx)
+		eou.log(text=f"Left {channelName}", cog="Channels", color="magenta", ctx=ctx)
 
 
 
@@ -127,7 +112,7 @@ class General(commands.Cog):
 
 		# Send output and log to console
 		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{user.name} has been added to {channelName}."))
-		eou.log(text=f"Added {user.name} to {channelName}", cog="General", color="magenta", ctx=ctx)
+		eou.log(text=f"Added {user.name} to {channelName}", cog="Channels", color="magenta", ctx=ctx)
 
 
 
@@ -157,7 +142,7 @@ class General(commands.Cog):
 
 		# Send output and log to console
 		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{user.name} has been kicked from {channelName}."))
-		eou.log(text=f"Kicked {user.name} from {channelName}", cog="General", color="magenta", ctx=ctx)
+		eou.log(text=f"Kicked {user.name} from {channelName}", cog="Channels", color="magenta", ctx=ctx)
 
 
 
@@ -184,7 +169,7 @@ class General(commands.Cog):
 
 		# Send output and log to console
 		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{channelName} successfully deleted."))
-		eou.log(text="DM deleted", cog="General", color="magenta", ctx=ctx)
+		eou.log(text="DM deleted", cog="Channels", color="magenta", ctx=ctx)
 
 
 
@@ -211,11 +196,25 @@ class General(commands.Cog):
 
 		# Send output and log to console
 		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{channelName} sucessfully renamed to {newChannelName}." ))
-		eou.log(text="DM renamed", cog="General", color="magenta", ctx=ctx)
+		eou.log(text="DM renamed", cog="Channels", color="magenta", ctx=ctx)
+
+
+
+	# o.createcategory [categoryName]
+	# o.renamecategory [categoryName] [newCategoryName]
+	# o.deletecategory [categoryName]
+
+	# o.movetocategory [channelName] [categoryName]
+	# o.removefromcategory [channelName] [categoryName]
+
+	# o.open [channelName]
+	# o.close [channelName]
+	# o.join [channelName]
+	# o.listopenchannels
 
 
 
 def setup(bot):
-	eou.log(text="Online", cog="General", color="magenta")
-	bot.add_cog(General(bot))
+	eou.log(text="Online", cog="Channels", color="magenta")
+	bot.add_cog(Channels(bot))
 	reload(eou)
