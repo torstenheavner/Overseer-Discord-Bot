@@ -68,7 +68,7 @@ class General(commands.Cog):
 				await vc.set_permissions(person, view_channel=True, connect=False)
 
 		# Send ouput and log to console
-		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"Channel{"s" if createVoice else ""} successfully created."))
+		await ctx.send(embed=eou.makeEmbed(title="Success!", description="Channel%s successfully created." % ("s" if createVoice else "")))
 		eou.log(text="New DM created", cog="General", color="magenta", ctx=ctx)
 
 
