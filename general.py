@@ -85,7 +85,7 @@ class General(commands.Cog):
 		if not tc:
 			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find that channel."))
 
-		# Get rid of the authors permissions for the necesarry channels
+		# Get rid of the authors permissions in the necesarry channels
 		await tc.set_permissions(ctx.author, overwrite=None)
 		if vc:
 			await vc.set_permissions(ctx.author, overwrite=None)
@@ -122,7 +122,29 @@ class General(commands.Cog):
 
 
 
-	# o.kick?
+	@commands.command(brief="Kick someone from a DM")
+	async def kick(self, ctx, person, channelName):
+		# o.kick [person] [channelName]
+
+		# Attempt to get the user and channels by the given names
+		user = discord.utils.get(self.server.members, name=person)
+		tc = discord.utils.get(self.server.text_channels, name=channelName)
+		vc = discord.utils.get(self.server.voice_channels, name=channelName)
+
+		# Throw an error if you cant find the user or text channel
+		if not user:
+			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find anyone with that name."))
+		if not tc:
+			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find that channel."))
+
+		# Get rid of the users permissions in the necesarry channels
+		await tc.set_permissions(user, overwrite=None)
+		if vc:
+			await vc.set_permissions(user, overwrite=None)
+
+		# Send output and log to console
+		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{user.name} has been kicked from {channelName}."))
+		eou.log(text=f"Kicked {user.name} from {channelName}", cog="General", color="magenta", ctx=ctx)
 
 
 
