@@ -200,13 +200,6 @@ class Channels(commands.Cog):
 
 
 
-	# o.createcategory [categoryName]
-	# o.renamecategory [categoryName] [newCategoryName]
-	# o.deletecategory [categoryName]
-
-	# o.movetocategory [channelName] [categoryName]
-	# o.removefromcategory [channelName] [categoryName]
-
 	# o.open [channelName]
 	# o.close [channelName]
 	# o.join [channelName]
