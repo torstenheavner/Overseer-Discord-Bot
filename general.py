@@ -10,6 +10,7 @@ import requests
 class General(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		self.server = self.bot.get_guild(729856235813470221)
 
 
 
@@ -39,26 +40,25 @@ class General(commands.Cog):
 
 		# Initial variable setup
 		people = people.split(" ")
-		server = self.bot.get_guild(729856235813470221)
 
 		# Change the array of names to an array of discord.Member objects
 		for i in range(len(people)):
 			username = people[i]
-			people[i] = discord.utils.get(server.members, name=people[i])
+			people[i] = discord.utils.get(self.server.members, name=people[i])
 			if not people[i]:
-				return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description=f"{username} isn't in the server!"))
+				return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description=f"I couldn't find anyone with that name."))
 
 		# Check if a channel with the given name alredy exists
-		if discord.utils.get(server.text_channels, name=channelName):
+		if discord.utils.get(self.server.text_channels, name=channelName):
 			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description=f"A DM with the name \"{channelName}\" already exists."))
 
 		# Create a new channel and prevent @everyone from seeing it
-		tc = await server.create_text_channel(channelName)
+		tc = await self.server.create_text_channel(channelName)
 		await tc.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
 
 		# If necesarry, create matching voice channel and prevent #everyone from seeing it
 		if createVoice:
-			vc = await server.create_voice_channel(channelName)
+			vc = await self.server.create_voice_channel(channelName)
 			await vc.set_permissions(ctx.guild.default_role, view_channel=False, connect=False)
 
 		# Allow everyone in the [people] array to see the channel(s)
@@ -68,7 +68,7 @@ class General(commands.Cog):
 				await vc.set_permissions(person, view_channel=True, connect=False)
 
 		# Send ouput and log to console
-		await ctx.send(embed=eou.makeEmbed(title="Success!", description="Channel%s successfully created." % ("s" if createVoice else "")))
+		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"Channel{"s" if createVoice else ""} successfully created."))
 		eou.log(text="New DM created", cog="General", color="magenta", ctx=ctx)
 
 
@@ -78,10 +78,10 @@ class General(commands.Cog):
 		# o.leave [channelName]
 
 		# Attempt to get the text and voice channels by the given name
-		tc = discord.utils.get(self.bot.get_guild(729856235813470221).text_channels, name=channelName)
-		vc = discord.utils.get(self.bot.get_guild(729856235813470221).voice_channels, name=channelName)
+		tc = discord.utils.get(self.server.text_channels, name=channelName)
+		vc = discord.utils.get(self.server.voice_channels, name=channelName)
 
-		# Throw an error if you cant find any text channel
+		# Throw an error if you cant find the text channel
 		if not tc:
 			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find that channel."))
 
@@ -96,7 +96,32 @@ class General(commands.Cog):
 
 
 
-	# o.add?
+	@commands.command(brief="Add someone to a DM")
+	async def add(self, ctx, person, channelName):
+		# o.add [person] [channelName]
+
+		# Attempt to get the user and channels by the given names
+		user = discord.utils.get(self.server.members, name=person)
+		tc = discord.utils.get(self.server.text_channels, name=channelName)
+		vc = discord.utils.get(self.server.voice_channels, name=channelName)
+
+		# Throw an error if you cant find the user or text channel
+		if not user:
+			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find anyone with that name."))
+		if not tc:
+			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find that channel."))
+
+		# Give the user permissions in the necesarry channels
+		await tc.set_permissions(user, read_messages=True, send_messages=True)
+		if vc:
+			await vc.set_permissions(user, read_messages=True, send_messages=True)
+
+		# Send output and log to console
+		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{user.name} has been added to {channelName}."))
+		eou.log(text=f"Added {user.name} to {channelName}", cog="General", color="magenta", ctx=ctx)
+
+
+
 	# o.kick?
 
 
@@ -106,10 +131,10 @@ class General(commands.Cog):
 		# o.delete [channelName]
 
 		# Attempt to get the text and voice channels by the given name
-		tc = discord.utils.get(self.bot.get_guild(729856235813470221).text_channels, name=channelName)
-		vc = discord.utils.get(self.bot.get_guild(729856235813470221).voice_channels, name=channelName)
+		tc = discord.utils.get(self.server.text_channels, name=channelName)
+		vc = discord.utils.get(self.server.voice_channels, name=channelName)
 
-		# Throw an error if you cant find any text channel
+		# Throw an error if you cant find the text channel
 		if not tc:
 			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find that channel."))
 
@@ -119,7 +144,7 @@ class General(commands.Cog):
 			await vc.delete()
 
 		# Send output and log to console
-		await ctx.send(embed=eou.makeEmbed(title="Success!", description="%s successfully deleted." % channelName))
+		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{channelName} successfully deleted."))
 		eou.log(text="DM deleted", cog="General", color="magenta", ctx=ctx)
 
 
@@ -129,10 +154,10 @@ class General(commands.Cog):
 		# o.rename [channelName] [newChannelName]
 
 		# Attempt to get the text and voice channels by the given name
-		tc = discord.utils.get(self.bot.get_guild(729856235813470221).text_channels, name=channelName)
-		vc = discord.utils.get(self.bot.get_guild(729856235813470221).voice_channels, name=channelName)
+		tc = discord.utils.get(self.server.text_channels, name=channelName)
+		vc = discord.utils.get(self.server.voice_channels, name=channelName)
 
-		# Throw an error if you cant find any text channel
+		# Throw an error if you cant find the text channel
 		if not tc:
 			return await ctx.send(embed=eou.makeEmbed(title="Whoops!", description="I couldn't find that channel."))
 
@@ -142,7 +167,7 @@ class General(commands.Cog):
 			await vc.edit(name=newChannelName)
 
 		# Send output and log to console
-		await ctx.send(embed=eou.makeEmbed(title="Success!", description="%s sucessfully renamed to %s" % (channelName, newChannelName)))
+		await ctx.send(embed=eou.makeEmbed(title="Success!", description=f"{channelName} sucessfully renamed to {newChannelName}." ))
 		eou.log(text="DM renamed", cog="General", color="magenta", ctx=ctx)
 
 
